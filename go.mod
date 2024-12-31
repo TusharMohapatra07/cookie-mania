@@ -1,3 +1,3 @@
-module cookie-mania
+module cookieMania
 
 go 1.23.4
