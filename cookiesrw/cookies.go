@@ -1,3 +1,18 @@
+// Package cookiesrw provides secure cookie handling with HMAC signature verification.
+//
+// The package implements signed cookie read/write operations where each cookie value
+// is structured as: {HMAC-SHA256-Signature}{Original-Value}
+//
+// Key features:
+// - Uses HMAC-SHA256 for cryptographic signing
+// - Prevents cookie tampering via signature verification
+// - Supports both reading and writing of signed cookies
+//
+// Security notes:
+// - The secret key must be kept private and secure
+// - Recommended to use high-entropy random keys (32+ bytes)
+// - Do not reuse secret keys across different applications
+
 package cookiesrw
 
 import (
@@ -7,12 +22,6 @@ import (
 
 	"cookieMania/cookierw"
 )
-
-//COOKIE READ WRITE WITH SIGN: This adds a layer of verification by adding a signature.
-//The cookie value will be of the form {HMAC SIGNATURE}{VALUE}. The signature will be
-// generated using any hashing algorithm (sha256 in this package). The secret key used
-// to generate the hash should not be shared anywhere. It should preferably be random
-// hex string with higher bytes of entropy
 
 func WriteSigned(w http.ResponseWriter, cookie http.Cookie, secretKey []byte) error {
 	mac := hmac.New(sha256.New, secretKey)

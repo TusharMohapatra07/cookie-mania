@@ -1,3 +1,14 @@
+// Package cookierw provides functions for reading and writing HTTP cookies with base64 encoding.
+//
+// When writing cookies, the value is automatically base64 encoded to ensure it only contains
+// valid ASCII characters and meets HTTP cookie specifications. When reading cookies, the
+// value is automatically decoded from base64.
+//
+// This package handles:
+// - Base64 encoding/decoding of cookie values
+// - Validation of cookie size limits
+// - Safe reading and writing of cookie data
+
 package cookierw
 
 import (
@@ -5,10 +16,6 @@ import (
 	"errors"
 	"net/http"
 )
-
-// COOKIE READ WRITE: A good way to ensure that the cookie value only contains
-//the US ASCII character is to base-64 encode the cookie value before writing
-//the value
 
 var (
 	ErrValueTooLong = errors.New("cookie value too long")
