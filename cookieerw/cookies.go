@@ -7,9 +7,8 @@ The cookie value will be encrypted using AES-256-GCM which provides both confide
 and authenticity. GCM mode combines the counter mode of operation for encryption with
 the Galois mode for authentication.
 
-The final cookie value will be in the format of {NONCE}{CIPHERTEXT}{AUTH TAG}.
+The final cookie value will be in the format of {NONCE}{CIPHERTEXT}.
 A random nonce is generated for each encryption operation to ensure uniqueness.
-The authentication tag helps verify the integrity of the encrypted data.
 
 Note: The encryption key should be kept secure and should have sufficient entropy
 (32 bytes recommended for AES-256).
