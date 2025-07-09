@@ -23,6 +23,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 func WriteEncrypted(w http.ResponseWriter, cookie http.Cookie, secretKey []byte) error {
@@ -49,4 +50,37 @@ func WriteEncrypted(w http.ResponseWriter, cookie http.Cookie, secretKey []byte)
 	cookie.Value = string(encryptedValue)
 
 	return cookierw.Write(w, cookie)
+}
+
+func ReadEncrypted(r *http.Request, cookieName string, secretKey []byte) (string, error) {
+	encryptedValue, err := cookierw.Read(r, cookieName)
+	if err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher(secretKey)
+	if err != nil {
+		return "", err
+	}
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+	nonceSize := aesGCM.NonceSize()
+	if len(encryptedValue) < nonceSize {
+		return "", cookierw.ErrInvalidValue
+	}
+	nonce, cipherText := encryptedValue[:nonceSize], encryptedValue[nonceSize:]
+	plainText, err := aesGCM.Open(nil, []byte(nonce), []byte(cipherText), nil)
+	if err != nil {
+		return "", cookierw.ErrInvalidValue
+	}
+	expectedName, Value, ok := strings.Cut(string(plainText), ":")
+	if !ok {
+		return "", cookierw.ErrInvalidValue
+	}
+	if expectedName != cookieName {
+		return "", cookierw.ErrInvalidValue
+	}
+	return Value, nil
 }
